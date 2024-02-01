@@ -3,10 +3,11 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function index() {
   const animalData = [
@@ -28,6 +29,7 @@ function index() {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     const data = {
       species: species,
       signs: chipData,
@@ -41,9 +43,18 @@ function index() {
     response.json().then((data) => {
       console.log(data);
       setOutputs(data);
+      setIsLoading(false);
     });
   };
   console.log(species);
+  const [isLoading, setIsLoading] = useState(false);
+  // useEffect(() => {
+  //   if (outputs !== null) {
+  //     setIsLoading(true);
+  //   }
+  //   setIsLoading(false);
+  // }, [outputs?.clinical]);
+
   return (
     <Box>
       <Box
@@ -84,7 +95,7 @@ function index() {
           id="combo-box-demo"
           options={animalData}
           sx={{ width: 300, background: "#fff" }}
-          onChange={(e, v) => setSpecies(v.label)}
+          onChange={(e, v) => setSpecies(v?.label)}
           renderInput={(params) => <TextField {...params} label="Animals" />}
         />
         <Button
@@ -97,7 +108,7 @@ function index() {
           Submit
         </Button>
       </Box>
-      {outputs != null && (
+      {!isLoading ? (
         <Box
           sx={{
             color: "#FFF",
@@ -105,66 +116,76 @@ function index() {
             textTransform: "capitalize",
           }}
         >
-          <Typography sx={{ fontSize: 20 }}>Diagnosis</Typography>
-          {outputs.diagnosis.possibleDiagnosis.map((val, i) => (
-            <Box key={i} sx={{ marginBlock: 5 }}>
-              <Typography>diagnosis: {val.diagnosis}</Typography>
-              <Typography>description: {val.description}</Typography>
-              <Typography>differentials: {val.differentials}</Typography>
-              <Typography>demographic: {val.demographic}</Typography>
-              <Typography>symptoms: {val.symptoms}</Typography>
-              <Typography>indicators: {val.indicators}</Typography>
-              <Typography>contraindicators: {val.contraindicators}</Typography>
-              <Typography>prognosis: {val.prognosis}</Typography>
-              <Typography>treatment: {val.treatment}</Typography>
-              <Typography>tests: {val.tests}</Typography>
+          {outputs !== null && (
+            <Box>
+              <Typography sx={{ fontSize: 20 }}>Diagnosis</Typography>
+              {outputs?.diagnosis?.possibleDiagnosis.map((val, i) => (
+                <Box key={i} sx={{ marginBlock: 5 }}>
+                  <Typography>diagnosis: {val.diagnosis}</Typography>
+                  <Typography>description: {val.description}</Typography>
+                  <Typography>differentials: {val.differentials}</Typography>
+                  <Typography>demographic: {val.demographic}</Typography>
+                  <Typography>symptoms: {val.symptoms}</Typography>
+                  <Typography>indicators: {val.indicators}</Typography>
+                  <Typography>
+                    contraindicators: {val.contraindicators}
+                  </Typography>
+                  <Typography>prognosis: {val.prognosis}</Typography>
+                  <Typography>treatment: {val.treatment}</Typography>
+                  <Typography>tests: {val.tests}</Typography>
+                </Box>
+              ))}
+              <Typography sx={{ fontSize: 20 }}>Clinical</Typography>
+              <Typography sx={{ textDecorationLine: "underline" }}>
+                Senses
+              </Typography>
+              <Typography>sight: {outputs?.clinical.senses.sight}</Typography>
+              <Typography>smell: {outputs?.clinical.senses.smell}</Typography>
+              <Typography>sound: {outputs?.clinical.senses.sound}</Typography>
+              <Typography>touch: {outputs?.clinical.senses.touch}</Typography>
+              <Typography sx={{ textDecorationLine: "underline" }}>
+                examination
+              </Typography>
+              {outputs?.clinical.examination.map((val, i) => (
+                <Box key={i}>
+                  <Typography>sound: {val.description}</Typography>
+                  <Typography>sound: {val.technique}</Typography>
+                </Box>
+              ))}
+              <Typography sx={{ textDecorationLine: "underline" }}>
+                interview
+              </Typography>
+              {outputs?.clinical.interview.map((val, i) => (
+                <Box key={i}>
+                  <Typography>sound: {val.purpose}</Typography>
+                  <Typography>sound: {val.question}</Typography>
+                </Box>
+              ))}
+              <Typography sx={{ fontSize: 20 }}>Referrals</Typography>
+              <Typography sx={{ textDecorationLine: "underline" }}>
+                Referral
+              </Typography>
+              {outputs?.referral.referrals.map((val, i) => (
+                <Box key={i}>
+                  <Typography>specialist: {val.specialist}</Typography>
+                  <Typography>description: {val.description}</Typography>
+                </Box>
+              ))}
+              <Typography sx={{ textDecorationLine: "underline" }}>
+                labTests
+              </Typography>
+              {outputs?.referral.labTests.map((val, i) => (
+                <Box key={i}>
+                  <Typography>description: {val.description}</Typography>
+                  <Typography>typeOfTest: {val.typeOfTest}</Typography>
+                </Box>
+              ))}
             </Box>
-          ))}
-          <Typography sx={{ fontSize: 20 }}>Clinical</Typography>
-          <Typography sx={{ textDecorationLine: "underline" }}>
-            Senses
-          </Typography>
-          <Typography>sight: {outputs.clinical.senses.sight}</Typography>
-          <Typography>smell: {outputs.clinical.senses.smell}</Typography>
-          <Typography>sound: {outputs.clinical.senses.sound}</Typography>
-          <Typography>touch: {outputs.clinical.senses.touch}</Typography>
-          <Typography sx={{ textDecorationLine: "underline" }}>
-            examination
-          </Typography>
-          {outputs.clinical.examination.map((val, i) => (
-            <Box key={i}>
-              <Typography>sound: {val.description}</Typography>
-              <Typography>sound: {val.technique}</Typography>
-            </Box>
-          ))}
-          <Typography sx={{ textDecorationLine: "underline" }}>
-            interview
-          </Typography>
-          {outputs.clinical.interview.map((val, i) => (
-            <Box key={i}>
-              <Typography>sound: {val.purpose}</Typography>
-              <Typography>sound: {val.question}</Typography>
-            </Box>
-          ))}
-          <Typography sx={{ fontSize: 20 }}>Referrals</Typography>
-          <Typography sx={{ textDecorationLine: "underline" }}>
-            Referral
-          </Typography>
-          {outputs.referral.referrals.map((val, i) => (
-            <Box key={i}>
-              <Typography>specialist: {val.specialist}</Typography>
-              <Typography>description: {val.description}</Typography>
-            </Box>
-          ))}
-          <Typography sx={{ textDecorationLine: "underline" }}>
-            labTests
-          </Typography>
-          {outputs.referral.labTests.map((val, i) => (
-            <Box key={i}>
-              <Typography>description: {val.description}</Typography>
-              <Typography>typeOfTest: {val.typeOfTest}</Typography>
-            </Box>
-          ))}
+          )}
+        </Box>
+      ) : (
+        <Box sx={{display:"flex",justifyContent:"center"}}>
+          <CircularProgress />
         </Box>
       )}
     </Box>
